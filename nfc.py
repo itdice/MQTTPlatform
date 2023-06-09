@@ -8,6 +8,6 @@ import subprocess
 
 with subprocess.Popen(["nfc-poll"], stdout=subprocess.PIPE) as process:
     nfc_raw_data: str = process.stdout.read().decode("utf-8")
-    nfc_uid = nfc_raw_data[nfc_raw_data.find('UID')+14:nfc_raw_data.find('UID')+27]
+    nfc_uid = nfc_raw_data[nfc_raw_data.find('UID')+14:nfc_raw_data.find('UID')+28]
 
 print(f"Result => {nfc_uid}")
