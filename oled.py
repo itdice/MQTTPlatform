@@ -10,22 +10,23 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-display = Adafruit_SSD1306.SSD1306_128_64(rst=24)
+RST = 24
 
-display.begin()
-width = display.width
-height = display.height
+disp = Adafruit_SSD1306.SSD1306_128_32(rst=24)
 
-display.clear()
-display.display()
+disp.begin()
+width = disp.width
+height = disp.height
 
-font = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 15)
+disp.clear()
+disp.display()
+
+font = ImageFont.truetype('SamsungOne/SamsungOneKorean-600.ttf', 15)
 image = Image.new('1',(width, height))
 draw = ImageDraw.Draw(image)
 
-draw.text((100, 100), 'TEST OLED', font=font, fill=255)
+draw.text((10, 10), 'TEST OLED', font=font, fill=255)
 
-display.image(image)
-display.display()
-time.sleep(3)
+disp.image(image)
+disp.display()
 
