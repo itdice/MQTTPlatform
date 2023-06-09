@@ -21,11 +21,11 @@ height = disp.height
 disp.clear()
 disp.display()
 
-font = ImageFont.truetype('SamsungOne/SamsungOneKorean-600.ttf', 15)
+font = ImageFont.truetype('SamsungOne/SamsungOneKorean-700.ttf', 15)
 image = Image.new('1',(width, height))
 draw = ImageDraw.Draw(image)
 
-draw.text((10, 10), '현재 습도가 높습니다', font=font, fill=255)
+draw.text((10, 5), '현재 습도가 높습니다', font=font, fill=255)
 
 disp.image(image)
 disp.display()
