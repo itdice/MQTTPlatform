@@ -21,7 +21,7 @@ height = disp.height
 disp.clear()
 disp.display()
 
-font = ImageFont.truetype('SamsungOne/SamsungOneKorean-700.ttf', 12)
+font = ImageFont.truetype('SamsungOne/SamsungOneKorean-700.ttf', 14)
 image = Image.new('1',(width, height))
 draw = ImageDraw.Draw(image)
 
