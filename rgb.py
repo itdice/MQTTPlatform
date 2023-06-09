@@ -51,7 +51,7 @@ try:
     while True:
         for col in colors:
             set_color(col)
-            time.sleep(0.2)
+            time.sleep(1)
 except KeyboardInterrupt:
     pwm_red.stop()
     pwm_green.stop()
