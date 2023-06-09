@@ -10,7 +10,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-display = Adafruit_SSD1306.SSD1406_128_64(rst=24)
+display = Adafruit_SSD1306.SSD1306_128_64(rst=24)
 
 display.begin()
 width = display.width
