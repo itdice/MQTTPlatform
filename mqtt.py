@@ -7,5 +7,5 @@
 import paho.mqtt.client as mqtt
 
 mqtt_client = mqtt.Client("raspi_pub")
-mqtt_client.connect("192.168.0.86", 1833)
+mqtt_client.connect("localhost", 1833)
 mqtt_client.publish("test/test", "hello!")
