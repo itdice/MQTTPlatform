@@ -11,8 +11,8 @@ INA = 9
 INB = 10
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(INA, GPIO.output)
-GPIO.setup(INB, GPIO.output)
+GPIO.setup(INA, GPIO.OUT)
+GPIO.setup(INB, GPIO.OUT)
 GPIO.output(INA, False)
 GPIO.output(INB, False)
 
