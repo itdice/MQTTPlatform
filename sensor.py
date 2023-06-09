@@ -8,7 +8,7 @@ import Adafruit_DHT
 
 sensor = Adafruit_DHT.DHT11
 
-DHT_PIN = 11
+DHT_PIN = 25
 
 humi, temp = Adafruit_DHT.read_retry(sensor, DHT_PIN)
 
