@@ -356,7 +356,7 @@ if __name__ == '__main__':
                 time.sleep(1)
 
             # Fan Part
-            if (FAN and DOOR and not CUR_FAN) or (FIX_FAN and DOOR and not CUR_FAN):
+            if (FAN and DOOR and not CUR_FAN) or (FIX_FAN and DOOR and not CUR_FAN)
                 fan_write(True, True)
                 image = Image.new('1', (width, height))
                 draw = ImageDraw.Draw(image)
@@ -367,7 +367,7 @@ if __name__ == '__main__':
                 disp.display()
                 CUR_FAN = True
                 time.sleep(1)
-            elif (not FAN and CUR_FAN and not FIX_FAN) or (not DOOR and CUR_FAN) or (not FIX_FAN and CUR_FAN):
+            elif (not FAN and not FIX_FAN and CUR_FAN) or not DOOR:
                 fan_write(False, True)
                 image = Image.new('1', (width, height))
                 draw = ImageDraw.Draw(image)
