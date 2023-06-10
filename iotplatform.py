@@ -13,6 +13,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import subprocess
 import time
+import json
 
 DOOR: bool = False
 FAN: bool = False
@@ -180,7 +181,8 @@ def sensor_read(mqtt_client: mqtt.Client):
 
     discomfort = discomfort_index(humi, temp)
     data: dict = {"temperature": temp, "humidity": humi, "discomfort_index": discomfort}
-    mqtt_client.publish("iot/data", data)
+    comp_data = json.dumps(data, indent=2).encode('utf-8')
+    mqtt_client.publish("iot/data", comp_data)
 
     if discomfort >= 80:
         rgb_write(True, False, False)  # RED
