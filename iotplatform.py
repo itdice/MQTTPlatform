@@ -177,7 +177,7 @@ def sensor_read():
 
     discomfort = discomfort_index(humi, temp)
     data: dict = {"temperature": temp, "humidity": humi, "discomfort_index": discomfort}
-    mqtt_client.publish("iot/data", data)
+    mqtt_client.publish("iot/data", str(data))
 
     if discomfort >= 80:
         rgb_write(True, False, False)  # RED
