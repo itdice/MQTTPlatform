@@ -365,7 +365,7 @@ if __name__ == '__main__':
                 disp.display()
                 CUR_FAN = True
                 time.sleep(1)
-            elif (not FAN and CUR_FAN) or (not DOOR and CUR_FAN) or (not FIX_FAN and CUR_FAN):
+            elif (not FAN and CUR_FAN and not FIX_FAN) or (not DOOR and CUR_FAN) or (not FIX_FAN and CUR_FAN):
                 fan_write(False, True)
                 image = Image.new('1', (width, height))
                 draw = ImageDraw.Draw(image)
@@ -377,7 +377,7 @@ if __name__ == '__main__':
                 CUR_FAN = False
                 time.sleep(1)
     except KeyboardInterrupt:
-        print("\tExit")
+        print("\nExit")
         GPIO.cleanup()
         mqtt_client.loop_stop()
     finally:
