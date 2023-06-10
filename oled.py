@@ -22,10 +22,11 @@ disp.clear()
 disp.display()
 
 font = ImageFont.truetype('SamsungOne/SamsungOneKorean-700.ttf', 14)
-image = Image.new('1',(width, height))
+image = Image.new('1', (width, height))
 draw = ImageDraw.Draw(image)
 
-draw.text((5, 20), '현재 습도가 높습니다', font=font, fill=255)
+draw.text((5, 10), 'Welcome To', font=font, fill=255)
+draw.text((5, 30), 'IT DICE IoT Platform', font=font, fill=255)
 
 disp.image(image)
 disp.display()
