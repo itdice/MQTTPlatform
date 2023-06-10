@@ -18,6 +18,7 @@ DOOR: bool = False
 FAN: bool = False
 CUR_DOOR: bool = False
 CUR_FAN: bool = False
+FIX_FAN: bool = False
 SCREEN: str = "반갑습니다"
 HUMI_HIGH: bool = False
 TEMP_HIGH: bool = False
@@ -38,7 +39,7 @@ def on_message(client: mqtt.Client, userdata, msg):
     payload_data = msg.payload.decode('utf-8')
     print(f"MQTT Data Received [{topic_data}] {payload_data}")
 
-    global DOOR, FAN, SCREEN
+    global DOOR, FIX_FAN, SCREEN
 
     if topic_data == "iot/door":
         if payload_data == "open":
@@ -47,9 +48,9 @@ def on_message(client: mqtt.Client, userdata, msg):
             DOOR = False
     elif topic_data == "iot/fan":
         if payload_data == "on":
-            FAN = True
+            FIX_FAN = True
         elif payload_data == "off":
-            FAN = False
+            FIX_FAN = False
     elif topic_data == "iot/screen":
         SCREEN = payload_data
 
@@ -220,6 +221,7 @@ if __name__ == '__main__':
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
     mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_forever()
 
     # OLED Setup
     disp = Adafruit_SSD1306.SSD1306_128_64(rst=24)
@@ -351,7 +353,7 @@ if __name__ == '__main__':
                 time.sleep(1)
 
             # Fan Part
-            if FAN and DOOR and not CUR_FAN:
+            if (FAN and DOOR and not CUR_FAN) or (FIX_FAN and DOOR and not CUR_FAN):
                 fan_write(True, True)
                 image = Image.new('1', (width, height))
                 draw = ImageDraw.Draw(image)
@@ -362,7 +364,7 @@ if __name__ == '__main__':
                 disp.display()
                 CUR_FAN = True
                 time.sleep(1)
-            elif (not FAN and CUR_FAN) or (not DOOR and CUR_FAN):
+            elif (not FAN and CUR_FAN) or (not DOOR and CUR_FAN) or (not FIX_FAN and CUR_FAN):
                 fan_write(False, True)
                 image = Image.new('1', (width, height))
                 draw = ImageDraw.Draw(image)
