@@ -164,7 +164,7 @@ def fan_write(control: bool, direction: bool):
         GPIO.output(INB, control)
 
 
-def sensor_read():
+def sensor_read(mqtt_client: mqtt.Client):
     print(f"==============================")
     print(f"Sensor Data Read")
     DHT_PIN = 25
@@ -242,7 +242,7 @@ if __name__ == '__main__':
     try:
         while True:
             # Sensor Part
-            sensor_read()
+            sensor_read(mqtt_client)
 
             if HUMI_HIGH and TEMP_HIGH and not FAN:
                 image = Image.new('1', (width, height))
