@@ -25,8 +25,9 @@ font = ImageFont.truetype('SamsungOne/SamsungOneKorean-700.ttf', 14)
 image = Image.new('1', (width, height))
 draw = ImageDraw.Draw(image)
 
-draw.text((5, 10), 'Welcome To', font=font, fill=255)
-draw.text((5, 30), 'IT DICE IoT Platform', font=font, fill=255)
+draw.text((5, 5), 'Welcome To', font=font, fill=255)
+draw.text((5, 25), 'IT DICE IoT', font=font, fill=255)
+draw.text((5, 45), 'Platform', font=font, fill=255)
 
 disp.image(image)
 disp.display()
