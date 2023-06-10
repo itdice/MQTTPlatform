@@ -100,6 +100,8 @@ def ultrasonic_read(_range: float) -> bool:
 
     check_time: float = stop - start
     distance: float = check_time * 34300 / 2
+    print("Distance : %.1f cm" % distance)
+    time.sleep(0.4)
     result: bool = True if (distance < _range) else False
 
     return result
