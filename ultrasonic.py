@@ -10,7 +10,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-TRIG = 23
+TRIG = 12
 ECHO = 24
 
 GPIO.setup(TRIG, GPIO.OUT)

@@ -73,7 +73,7 @@ def nfc_read() -> str:
 def ultrasonic_setup():
     print(f"==============================")
     print(f"Ultrasonic Sensor Setup")
-    TRIG = 23
+    TRIG = 12
     ECHO = 24
 
     GPIO.setup(TRIG, GPIO.OUT)  # Trigger Pin Setup
@@ -86,7 +86,7 @@ def ultrasonic_setup():
 
 
 def ultrasonic_read(_range: float) -> bool:
-    TRIG = 23
+    TRIG = 12
     ECHO = 24
 
     while True:
