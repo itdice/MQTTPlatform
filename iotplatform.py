@@ -2,7 +2,7 @@
 # iotplatform.py
 # Wireless Network Term Project
 #
-# Created by IT DICE on 2023/06/05.
+# Created by IT DICE on 2023/06/07.
 #
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
@@ -13,6 +13,14 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import subprocess
 import time
+
+DOOR: bool = False
+FAN: bool = False
+CUR_DOOR: bool = False
+CUR_FAN: bool = False
+SCREEN: str = "반갑습니다"
+HUMI_HIGH: bool = False
+TEMP_HIGH: bool = False
 
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
@@ -30,18 +38,20 @@ def on_message(client: mqtt.Client, userdata, msg):
     payload_data = msg.payload.decode('utf-8')
     print(f"MQTT Data Received [{topic_data}] {payload_data}")
 
+    global DOOR, FAN, SCREEN
+
     if topic_data == "iot/door":
         if payload_data == "open":
-            pass  # Todo Door Open
+            DOOR = True
         elif payload_data == "close":
-            pass  # Todo Door Close
+            DOOR = False
     elif topic_data == "iot/fan":
         if payload_data == "on":
-            pass  # Todo Fan ON
+            FAN = True
         elif payload_data == "off":
-            pass  # Todo Fan OFF
+            FAN = False
     elif topic_data == "iot/screen":
-        pass  # Todo OLED Screen Customize
+        SCREEN = payload_data
 
     print(f"==============================")
 
@@ -159,6 +169,8 @@ def sensor_read():
     print(f"Sensor Data Read")
     DHT_PIN = 25
 
+    global HUMI_HIGH, TEMP_HIGH
+
     sensor = Adafruit_DHT.DHT11
     humi, temp = Adafruit_DHT.read_retry(sensor, DHT_PIN)
     print("Temp => {0:0.1f}°C, Humi => {1:0.1f}%".format(temp, humi))
@@ -168,13 +180,23 @@ def sensor_read():
     mqtt_client.publish("iot/data", data)
 
     if discomfort >= 80:
-        pass  # Todo Extreme
+        rgb_write(True, False, False)  # RED
     elif 75 <= discomfort < 80:
-        pass  # Todo High
+        rgb_write(True, True, False)  # YELLOW
     elif 68 <= discomfort < 75:
-        pass  # Todo Moderate
+        rgb_write(False, True, False)  # GREEN
     elif discomfort < 68:
-        pass  # Todo Good
+        rgb_write(False, True, True)  # CYAN
+
+    if humi >= 65.0:
+        HUMI_HIGH = True
+    else:
+        HUMI_HIGH = False
+
+    if temp >= 30.0:
+        TEMP_HIGH = True
+    else:
+        TEMP_HIGH = False
 
     print(f"==============================")
 
@@ -188,6 +210,9 @@ if __name__ == '__main__':
     # initial GPIO Setup
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
+    ultrasonic_setup()
+    rgb_setup()
+    fan_setup()
 
     # MQTT Setup
     mqtt_client = mqtt.Client("raspi_pub")
@@ -207,6 +232,149 @@ if __name__ == '__main__':
     font = ImageFont.truetype('SamsungOne/SamsungOneKorean-700.ttf', 14)
     image = Image.new('1', (width, height))
     draw = ImageDraw.Draw(image)
-    draw.text((10, 7), '현재 습도가 높습니다', font=font, fill=255)
+    draw.text((5, 5), 'Welcome To', font=font, fill=255)
+    draw.text((5, 25), 'IT DICE IoT', font=font, fill=255)
+    draw.text((5, 45), 'Platform', font=font, fill=255)
     disp.image(image)
     disp.display()
+
+    # Loop Section
+    try:
+        while True:
+            # Sensor Part
+            sensor_read()
+
+            if HUMI_HIGH and TEMP_HIGH and not FAN:
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), '현재 습도가 높습니다', font=font, fill=255)
+                draw.text((5, 25), '현재 온도가 높습니다', font=font, fill=255)
+                draw.text((5, 45), '선풍기를 작동합니다', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                FAN = True
+                time.sleep(1)
+            elif HUMI_HIGH and not TEMP_HIGH and FAN:
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), '현재 습도가 높습니다', font=font, fill=255)
+                draw.text((5, 25), '현재 온도가 낮습니다', font=font, fill=255)
+                draw.text((5, 45), '선풍기를 중지합니다', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                FAN = False
+                time.sleep(1)
+            elif not HUMI_HIGH and TEMP_HIGH and not FAN:
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), '현재 습도가 낮습니다', font=font, fill=255)
+                draw.text((5, 25), '현재 온도가 높습니다', font=font, fill=255)
+                draw.text((5, 45), '선풍기를 작동합니다', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                FAN = True
+                time.sleep(1)
+            elif not HUMI_HIGH and not TEMP_HIGH and FAN:
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), '현재 습도가 낮습니다', font=font, fill=255)
+                draw.text((5, 25), '현재 온도가 낮습니다', font=font, fill=255)
+                draw.text((5, 45), '선풍기를 중지합니다', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                FAN = False
+                time.sleep(1)
+
+            # Ultrasonic Part
+            if ultrasonic_read(30.0):
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), SCREEN, font=font, fill=255)
+                draw.text((5, 25), '==============', font=font, fill=255)
+                draw.text((5, 45), 'NFC 입력 대기중...', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                read_data: str = nfc_read()
+
+                if read_data == "313cb0e0" and not DOOR:
+                    image = Image.new('1', (width, height))
+                    draw = ImageDraw.Draw(image)
+                    draw.text((5, 5), "사용자님 반갑습니다.", font=font, fill=255)
+                    draw.text((5, 25), '==============', font=font, fill=255)
+                    draw.text((5, 45), '출입문이 열립니다..', font=font, fill=255)
+                    disp.image(image)
+                    disp.display()
+                    DOOR = True
+                    time.sleep(1)
+                elif read_data == "313cb0e0" and DOOR:
+                    image = Image.new('1', (width, height))
+                    draw = ImageDraw.Draw(image)
+                    draw.text((5, 5), "안녕히 가십시오.", font=font, fill=255)
+                    draw.text((5, 25), '==============', font=font, fill=255)
+                    draw.text((5, 45), '출입문이 닫힙니다.', font=font, fill=255)
+                    disp.image(image)
+                    disp.display()
+                    DOOR = False
+                    time.sleep(1)
+                elif read_data != "313cb0e0":
+                    image = Image.new('1', (width, height))
+                    draw = ImageDraw.Draw(image)
+                    draw.text((5, 5), "등록되지 않은 사용자", font=font, fill=255)
+                    draw.text((5, 25), '==============', font=font, fill=255)
+                    draw.text((5, 45), '다시 시도해 주세요.', font=font, fill=255)
+                    disp.image(image)
+                    disp.display()
+                    time.sleep(1)
+
+            # Door Part
+            if DOOR and not CUR_DOOR:
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), "==============", font=font, fill=255)
+                draw.text((5, 25), '출입문이 열렸습니다.', font=font, fill=255)
+                draw.text((5, 45), '==============', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                CUR_DOOR = True
+                time.sleep(1)
+            elif not DOOR and CUR_DOOR:
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), "==============", font=font, fill=255)
+                draw.text((5, 25), '출입문이 닫혔습니다.', font=font, fill=255)
+                draw.text((5, 45), '==============', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                CUR_DOOR = False
+                time.sleep(1)
+
+            # Fan Part
+            if FAN and DOOR and not CUR_FAN:
+                fan_write(True, True)
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), "==============", font=font, fill=255)
+                draw.text((5, 25), '선풍기를 켭니다.', font=font, fill=255)
+                draw.text((5, 45), '==============', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                CUR_FAN = True
+                time.sleep(1)
+            elif (not FAN and CUR_FAN) or (not DOOR and CUR_FAN):
+                fan_write(False, True)
+                image = Image.new('1', (width, height))
+                draw = ImageDraw.Draw(image)
+                draw.text((5, 5), "==============", font=font, fill=255)
+                draw.text((5, 25), '선풍기를 끕니다.', font=font, fill=255)
+                draw.text((5, 45), '==============', font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                CUR_FAN = False
+                time.sleep(1)
+
+
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        pass
