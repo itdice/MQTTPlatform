@@ -23,13 +23,16 @@ time.sleep(2)
 try:
     while True:
         GPIO.output(TRIG, True)
+        print("Triggered")
         time.sleep(0.00001)
         GPIO.output(TRIG, False)
 
         while GPIO.input(ECHO) == 0:
+            print("echo start")
             start = time.time()
 
         while GPIO.input(ECHO) == 1:
+            print("echo end")
             stop = time.time()
 
         check_time = stop - start
