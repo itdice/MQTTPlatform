@@ -220,8 +220,10 @@ if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     ultrasonic_setup()
+    '''
     rgb_setup()
     fan_setup()
+    '''
 
     # MQTT Setup
     mqtt_client = mqtt.Client("raspi_pub")
@@ -250,6 +252,7 @@ if __name__ == '__main__':
     # Loop Section
     try:
         while True:
+            '''
             # Sensor Part
             sensor_read(mqtt_client)
 
@@ -293,6 +296,7 @@ if __name__ == '__main__':
                 disp.display()
                 FAN = False
                 time.sleep(1)
+            '''
 
             # Ultrasonic Part
             if ultrasonic_read(30.0):
@@ -335,6 +339,7 @@ if __name__ == '__main__':
                     disp.display()
                     time.sleep(1)
 
+            '''
             # Door Part
             if DOOR and not CUR_DOOR:
                 image = Image.new('1', (width, height))
@@ -380,9 +385,7 @@ if __name__ == '__main__':
                 disp.display()
                 CUR_FAN = False
                 time.sleep(1)
-
-
-
+            '''
     except KeyboardInterrupt:
         pass
     finally:
