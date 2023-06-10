@@ -212,7 +212,6 @@ if __name__ == '__main__':
     # initial GPIO Setup
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    ultrasonic_setup()
     rgb_setup()
     fan_setup()
 
@@ -288,6 +287,7 @@ if __name__ == '__main__':
                 time.sleep(1)
 
             # Ultrasonic Part
+            ultrasonic_setup()
             if ultrasonic_read(30.0):
                 image = Image.new('1', (width, height))
                 draw = ImageDraw.Draw(image)
