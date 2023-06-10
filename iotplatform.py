@@ -89,19 +89,25 @@ def ultrasonic_read(_range: float) -> bool:
     TRIG = 23
     ECHO = 24
 
-    GPIO.output(TRIG, True)  # Trigger Pulse 10us
-    time.sleep(0.00001)
-    GPIO.output(TRIG, False)
+    while True:
+        GPIO.output(TRIG, True)  # Trigger Pulse 10us
+        time.sleep(0.00001)
+        GPIO.output(TRIG, False)
 
-    while GPIO.input(ECHO) == 0:
-        start = time.time()
-    while GPIO.input(ECHO) == 1:
-        stop = time.time()
+        while GPIO.input(ECHO) == 0:
+            start = time.time()
 
-    check_time: float = stop - start
-    distance: float = check_time * 34300 / 2
-    print("Distance : %.1f cm" % distance)
-    time.sleep(0.4)
+        while GPIO.input(ECHO) == 1:
+            stop = time.time()
+
+        check_time: float = stop - start
+        distance: float = check_time * 34300 / 2
+        print("Distance : %.1f cm" % distance)
+        time.sleep(0.4)
+
+        if distance > 0:
+            break
+
     result: bool = True if (distance < _range) else False
 
     return result
