@@ -221,7 +221,8 @@ if __name__ == '__main__':
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
     mqtt_client.connect("localhost", 1883, 60)
-    mqtt_client.loop_forever()
+    mqtt_client.loop_start()
+
 
     # OLED Setup
     disp = Adafruit_SSD1306.SSD1306_128_64(rst=24)
@@ -375,10 +376,9 @@ if __name__ == '__main__':
                 disp.display()
                 CUR_FAN = False
                 time.sleep(1)
-
-
-
     except KeyboardInterrupt:
-        pass
+        print("\tExit")
+        GPIO.cleanup()
+        mqtt_client.loop_stop()
     finally:
-        pass
+        print("Done!")
